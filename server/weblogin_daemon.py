@@ -254,7 +254,7 @@ def __login(session_id):
             redirect = this_auth.get('redirect')
             if (redirect != ""):
                 response = Response(status=302)
-                response.headers['Location'] = f'{redirect_url}'
+                response.headers['Location'] = f'{redirect}'
                 return response
                 
             message = f"<h1>SSH request</h1>\n"
