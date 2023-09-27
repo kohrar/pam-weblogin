@@ -126,6 +126,10 @@ def start():
     user_id = data.get('user_id')
     attribute = data.get('attribute')
     cache_duration = data.get('cache_duration', 0)
+    redirect = data.get('redirect', "")
+    auth_only = data.get('auth_only', "false")
+    auth_only = (auth_only == "true");
+    
     new_session_id = session_id()
     url = os.environ.get("URL", config['url']).rstrip('/')
     qr_code = create_qr(url)
@@ -140,10 +144,6 @@ def start():
         'info': 'Login was cached' if cache else 'Sign in'
     }
 
-    response = Response(status=201)
-    response.headers['Content-Type'] = "application/json"
-    response.data = json.dumps(auths[new_session_id])
-
     # The Smart Shell testcase
     if not user_id:
         user_id = attribute
@@ -153,7 +153,19 @@ def start():
     auths[new_session_id]['attribute'] = attribute
     auths[new_session_id]['code'] = new_code
     auths[new_session_id]['cache_duration'] = cache_duration
+    auths[new_session_id]['redirect'] = redirect
+    auths[new_session_id]['auth_only'] = auth_only
     Timer(timeout, pop_auth, [new_session_id]).start()
+
+    # A redirect URL was given, we'll automatically redirect the user to the session page, which when successful will redirect the user to the redirect URL that's given.
+    if (redirect != ""):
+        response = Response(status=302)
+        response.headers['Location'] = f'{url}/pam-weblogin/login/{new_session_id}'
+        return response
+
+    response = Response(status=201)
+    response.headers['Content-Type'] = "application/json"
+    response.data = json.dumps(auths[new_session_id])
 
     logging.debug(f' -> {response.data.decode()}\n'
                   f'  code: {new_code}')
@@ -228,15 +240,23 @@ def __login(session_id):
         request.data
         user_id = this_auth.get('user_id')
         attribute_id = userinfo.get(this_auth.get('attribute'))
+        auth_only = this_auth.get('auth_only')
         logging.info(f"user_id: {user_id}, attribute_id: {attribute_id}")
         if (user_id
             and attribute_id
-            and user_id in attribute_id
+            and (auth_only == "true" or user_id in attribute_id)
             or not oidc_enabled):
             user_id = Markup.escape(user_id)
             attribute_id = Markup.escape(attribute_id)
             code = this_auth['code']
             code = Markup.escape(code)
+            
+            redirect = this_auth.get('redirect')
+            if (redirect != ""):
+                response = Response(status=302)
+                response.headers['Location'] = f'{redirect_url}'
+                return response
+                
             message = f"<h1>SSH request</h1>\n"
             message += f"for session {session_id}/{user_id}<br>\n"
             message += f"{attribute_id} successfully authenticated<br>\n"
