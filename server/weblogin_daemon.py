@@ -137,6 +137,7 @@ def start():
     displayname = user_id or 'weblogin'
     auths[new_session_id] = {
         'session_id': new_session_id,
+        'challenge_url': f'{url}/pam-weblogin/login/{new_session_id}',
         'challenge': f'Hello {displayname}. To continue, '
                      f'visit {url}/pam-weblogin/login/{new_session_id} and enter verification code\n\n'
                      f'{qr_code}',
