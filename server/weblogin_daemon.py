@@ -237,7 +237,7 @@ def __login(session_id):
             code = this_auth['code']
             code = Markup.escape(code)
             
-            auths[new_session_id]['matching_attribute'] = attribute_id
+            auths[session_id]['matching_attribute'] = attribute_id
             
             redirect = this_auth.get('redirect')
             if (redirect != ""):
