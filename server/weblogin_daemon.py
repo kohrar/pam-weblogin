@@ -145,10 +145,6 @@ def start():
         'info': 'Login was cached' if cache else 'Sign in'
     }
 
-    # The Smart Shell testcase
-    if not user_id:
-        user_id = attribute
-
     new_code = code()
     auths[new_session_id]['user_id'] = user_id
     auths[new_session_id]['attribute'] = attribute
@@ -240,6 +236,8 @@ def __login(session_id):
             attribute_id = Markup.escape(attribute_id)
             code = this_auth['code']
             code = Markup.escape(code)
+            
+            auths[new_session_id]['matching_attribute'] = attribute_id
             
             redirect = this_auth.get('redirect')
             if (redirect != ""):
