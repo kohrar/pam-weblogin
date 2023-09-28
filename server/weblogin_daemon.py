@@ -191,11 +191,6 @@ def check_pin():
             reply = {
                 'result': 'SUCCESS',
                 'username': user_id,
-                'colist': {
-                    'coaaa': 'A CO with the beautiful name AAA',
-                    'cobbb': 'A CO named BBB',
-                    'coccc': 'A CO named CCC!',
-                },
                 'info': f'Authenticated on attribute {attribute}'
             }
             cached[user_id] = True
