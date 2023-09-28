@@ -181,12 +181,14 @@ def check_pin():
     if this_auth:
         user_id = this_auth.get('user_id')
         attribute = this_auth.get('attribute')
+        matching_attribute = this_auth.get('matching_attribute')
         code = this_auth.get('code')
         cache_duration = this_auth.get('cache_duration')
         if rcode == code:
             reply = {
                 'result': 'SUCCESS',
                 'username': user_id,
+                'matching_attribute': matching_attribute,
                 'info': f'Authenticated on attribute {attribute}'
             }
             cached[user_id] = True
