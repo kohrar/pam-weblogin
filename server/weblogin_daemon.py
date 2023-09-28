@@ -156,13 +156,7 @@ def start():
     auths[new_session_id]['redirect'] = redirect
     auths[new_session_id]['auth_only'] = auth_only
     Timer(timeout, pop_auth, [new_session_id]).start()
-
-    # A redirect URL was given, we'll automatically redirect the user to the session page, which when successful will redirect the user to the redirect URL that's given.
-    if (redirect != ""):
-        response = Response(status=302)
-        response.headers['Location'] = f'{url}/pam-weblogin/login/{new_session_id}'
-        return response
-
+    
     response = Response(status=201)
     response.headers['Content-Type'] = "application/json"
     response.data = json.dumps(auths[new_session_id])
