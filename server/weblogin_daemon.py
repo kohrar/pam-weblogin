@@ -7,6 +7,7 @@ import random
 import logging
 import yaml
 import qrcode
+import urllib.parse
 
 from threading import Timer
 from datetime import timedelta
@@ -100,6 +101,19 @@ def create_qr(url):
 
     return f.read()
 
+def add_token(url, token):
+    # Parse the URL into its components
+    url_parts = urllib.parse.urlparse(url)
+    # Parse the query string into a dictionary
+    query_dict = urllib.parse.parse_qs(url_parts.query)
+    # Add the token to the dictionary
+    query_dict['token'] = token
+    # Encode the dictionary back into a query string
+    query_string = urllib.parse.urlencode(query_dict, doseq=True)
+    # Replace the query component of the URL with the new query string
+    new_url_parts = url_parts._replace(query=query_string)
+    # Return the modified URL as a string
+    return urllib.parse.urlunparse(new_url_parts)
 
 @app.route('/pam-weblogin/ssh_keys', methods=['GET'])
 def ssh():
@@ -244,7 +258,8 @@ def __login(session_id):
             redirect = this_auth.get('redirect')
             if (redirect != ""):
                 response = Response(status=302)
-                response.headers['Location'] = f'{redirect}'
+                # Redirect the client back with the code given as a ?token=
+                response.headers['Location'] = add_token(redirect, code)
                 return response
                 
             message = f"<h1>SSH request</h1>\n"
