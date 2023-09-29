@@ -107,7 +107,7 @@ def add_token(url, token):
     # Parse the query string into a dictionary
     query_dict = urllib.parse.parse_qs(url_parts.query)
     # Add the token to the dictionary
-    query_dict['token'] = token
+    query_dict['weblogin-token'] = token
     # Encode the dictionary back into a query string
     query_string = urllib.parse.urlencode(query_dict, doseq=True)
     # Replace the query component of the URL with the new query string
@@ -146,15 +146,14 @@ def start():
     
     new_session_id = session_id()
     url = os.environ.get("URL", config['url']).rstrip('/')
-    qr_code = create_qr(url)
+    # qr_code = create_qr(url)
     cache = cached.get(user_id, False)
     displayname = user_id or 'weblogin'
     auths[new_session_id] = {
         'session_id': new_session_id,
         'challenge_url': f'{url}/pam-weblogin/login/{new_session_id}',
         'challenge': f'Hello {displayname}. To continue, '
-                     f'visit {url}/pam-weblogin/login/{new_session_id} and enter verification code\n\n'
-                     f'{qr_code}',
+                     f'visit {url}/pam-weblogin/login/{new_session_id} and enter the given verification code\n\n',
         'cached': cache,
         'info': 'Login was cached' if cache else 'Sign in'
     }
@@ -258,7 +257,7 @@ def __login(session_id):
             redirect = this_auth.get('redirect')
             if (redirect != ""):
                 response = Response(status=302)
-                # Redirect the client back with the code given as a ?token=
+                # Redirect the client back with the code given as a ?weblogin-token=
                 response.headers['Location'] = add_token(redirect, code)
                 return response
                 
