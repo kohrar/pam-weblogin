@@ -1,5 +1,5 @@
 qrcode
 pyyaml
-Flask
+Flask==2.3.3
 Flask-pyoidc
 Flask-Session
