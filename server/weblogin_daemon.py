@@ -78,7 +78,7 @@ def session_id(length=8):
     return ''.join([str(random.choice(chars)) for i in range(length)])
 
 
-def code(length=4):
+def code(length=8):
     return ''.join([str(random.choice(numbers)) for i in range(length)])
 
 
